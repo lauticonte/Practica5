@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   IonContent, 
   IonHeader, 
@@ -19,8 +19,13 @@ import CharacterContainer from '../components/CharacterContainer';
 import { addCircle } from 'ionicons/icons';
 import { Character } from '../models/character.model';
 import Card from './Card';
+import { Storage } from "@capacitor/storage";
+import { toast } from '../toast';
+
 
 const Home: React.FC = () => {
+  const pageRef = useRef<HTMLIonContentElement>(null);
+
   const [characters, setCharacters] = useState<Character[]>([]);
   const [nextstate, setNextstate] = useState(false);
   const [character, setCharacter] = useState<Character>({});
@@ -31,11 +36,11 @@ const Home: React.FC = () => {
     const getApi = async () => {
       const url = `https://rickandmortyapi.com/api/character`;
       const result = await axios.get(url);
-      setCharacters(result.data.results);
+      setCharacters(result.data.results);      
     };
     getApi();
+    saveCharacters(characters);
   }, []);
-
 
   const fillApi = async () => {
     const url = `https://rickandmortyapi.com/api/character/?page=${page}`;
@@ -47,11 +52,25 @@ const Home: React.FC = () => {
       ...characters.concat(result.data.results),
     ]);
     setPage(page + 1);
+    saveCharacters(characters);
+  };
+
+  const saveCharacters = async (characters: Character[]) => {
+    const json = JSON.stringify(characters);
+    await Storage.set({
+      key: 'characters',
+      value: json,
+    });
+  };  
+
+  const deleteCharacter = (id: number) => {
+    const newCharacters = characters.filter(character => character.id !== id);
+    setCharacters(newCharacters);
   };
 
 
   return (
-    <IonPage>
+    <IonPage ref={pageRef}>
       <IonHeader>
         <IonToolbar>
           <IonTitle>Characters</IonTitle>
@@ -81,7 +100,7 @@ const Home: React.FC = () => {
         ) : null}        
       </IonContent>
       {nextstate ? (
-        <Card character={character} setNextstate={setNextstate} />
+        <Card character={character} setNextstate={setNextstate}/>
         ) : null }
     </IonPage>
   );

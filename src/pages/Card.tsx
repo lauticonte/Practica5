@@ -1,9 +1,5 @@
-import React, { Fragment } from "react";
+import React, { useState } from "react";
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
@@ -12,35 +8,34 @@ import {
   IonIcon,
   IonButton,
   IonGrid,
+  IonModal,
+  IonToast,
+  useIonToast,
 } from "@ionic/react";
 import { Character } from "../models/character.model";
-import { arrowBack } from "ionicons/icons";
+import { trashBin} from "ionicons/icons";
+import { toast } from "../toast";
 
 const Card: React.FC<{
     character: Character;
     setNextstate: Function;
   }> = ({ character, setNextstate }) => {
+
+    const [showModal] = useState(true);
+
+    const [present, dismiss] = useIonToast();
+
     return (
-      <>
-        <IonHeader style={{ position: "absolute" }}>
-          <IonToolbar>
-            <IonButton
-              slot="start"
-              color="dark"
-              style={{ marginLeft: 10 }}
-              onClick={() => {
-                setNextstate(false);
-              }}
-            >
-              <IonIcon icon={arrowBack} />
-            </IonButton>
-            <IonTitle>Character</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent fullscreen style={{ position: "absolute", top: 56 }}>
-          <IonCard>
+      <div>
+      <IonModal
+          isOpen={showModal}
+          initialBreakpoint={0.5}
+          breakpoints={[0, 0.5, 1]}
+          onDidDismiss={() => setNextstate(false)}>
+        
+      <IonCard>
             <IonGrid style={{display: "flex", justifyContent: "center", padding: 15}}>
-              <img src={character.image} />
+              <img src={character.image} alt={character.name} />
             </IonGrid>
             <IonCardHeader>
               {character.type === "" ? (
@@ -60,8 +55,21 @@ const Card: React.FC<{
             </IonCardContent>
           </IonCard>
           <IonGrid style={{height: 56}}></IonGrid>
-        </IonContent>
-      </>
+          <IonButton 
+          style={{display: "flex", justifyContent: "center"}}
+          onClick={() => 
+            present({
+              buttons: [{ text: 'hide', handler: () => dismiss() }],
+              message: 'Character removed',
+              onDidDismiss: () => console.log('dismissed'),
+              onWillDismiss: () => console.log('will dismiss'),
+            })
+          }>
+              Delete Character&nbsp;
+            <IonIcon icon={trashBin} />
+          </IonButton>
+      </IonModal>
+      </div>
     );
   };
   

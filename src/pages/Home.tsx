@@ -19,8 +19,7 @@ import CharacterContainer from '../components/CharacterContainer';
 import { addCircle } from 'ionicons/icons';
 import { Character } from '../models/character.model';
 import Card from './Card';
-import { Storage } from "@capacitor/storage";
-import { toast } from '../toast';
+// import { Storage } from "@capacitor/storage";
 
 
 const Home: React.FC = () => {
@@ -39,7 +38,7 @@ const Home: React.FC = () => {
       setCharacters(result.data.results);      
     };
     getApi();
-    saveCharacters(characters);
+    // saveCharacters(characters);
   }, []);
 
   const fillApi = async () => {
@@ -52,21 +51,16 @@ const Home: React.FC = () => {
       ...characters.concat(result.data.results),
     ]);
     setPage(page + 1);
-    saveCharacters(characters);
+    // saveCharacters(characters);
   };
 
-  const saveCharacters = async (characters: Character[]) => {
-    const json = JSON.stringify(characters);
-    await Storage.set({
-      key: 'characters',
-      value: json,
-    });
-  };  
-
-  const deleteCharacter = (id: number) => {
-    const newCharacters = characters.filter(character => character.id !== id);
-    setCharacters(newCharacters);
-  };
+  // const saveCharacters = async (characters: Character[]) => {
+  //   const json = JSON.stringify(characters);
+  //   await Storage.set({
+  //     key: 'characters',
+  //     value: json,
+  //   });
+  // };
 
 
   return (

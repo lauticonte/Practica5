@@ -9,12 +9,10 @@ import {
   IonButton,
   IonGrid,
   IonModal,
-  IonToast,
   useIonToast,
 } from "@ionic/react";
 import { Character } from "../models/character.model";
 import { trashBin} from "ionicons/icons";
-import { toast } from "../toast";
 
 const Card: React.FC<{
     character: Character;

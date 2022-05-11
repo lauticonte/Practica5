@@ -13,13 +13,15 @@ import {
 } from "@ionic/react";
 import { Character } from "../models/character.model";
 import { trashBin} from "ionicons/icons";
+import { Toast } from "@capacitor/toast";
 
 const Card: React.FC<{
     character: Character;
     setNextstate: Function;
-  }> = ({ character, setNextstate }) => {
+    deleteCharacter: Function;
+  }> = ({ character, setNextstate, deleteCharacter }) => {
 
-    const [showModal] = useState(true);
+    const [showModal, setShowModal] = useState(true);
 
     const [present, dismiss] = useIonToast();
 
@@ -55,12 +57,26 @@ const Card: React.FC<{
           <IonGrid style={{height: 56}}></IonGrid>
           <IonButton 
           style={{display: "flex", justifyContent: "center"}}
-          onClick={() => 
+          onClick={() =>
             present({
-              buttons: [{ text: 'hide', handler: () => dismiss() }],
-              message: 'Character removed',
-              onDidDismiss: () => console.log('dismissed'),
-              onWillDismiss: () => console.log('will dismiss'),
+              message: `Are you sure you want to delete ${character.name}?`,
+              buttons: [
+                {
+                  text: "Cancel",
+                  role: "cancel",
+                  handler: () => {
+                    dismiss();
+                  }
+                },
+                {
+                  text: "Delete",
+                  handler: () => {
+                    deleteCharacter(character.id);
+                    dismiss();
+                    setShowModal(false);
+                  }
+                }
+              ]
             })
           }>
               Delete Character&nbsp;

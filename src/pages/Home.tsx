@@ -20,6 +20,7 @@ import { addCircle } from 'ionicons/icons';
 import { Character } from '../models/character.model';
 import Card from './Card';
 import { Storage } from "@capacitor/storage";
+import { Toast } from '@capacitor/toast';
 
 
 const Home: React.FC = () => {
@@ -33,12 +34,11 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const checkStorage = async () => {
-      await Storage.get({ key: 'characters' }).then(async (data) => {
-        if (data.value) {
+      await Storage.get({ key: 'characters' }).then(async (data) => {      
+        if (data.value && localStorage.getItem('CapacitorStorage.characters') !== null) {
           const characters = JSON.parse(data.value);
           setCharacters(characters);
-          console.log("Characters from storage");
-
+          console.log("Characters loaded from LocalStorage");
         } else {
           const url = 'https://rickandmortyapi.com/api/character';
           const result = await axios.get(url);
@@ -47,14 +47,34 @@ const Home: React.FC = () => {
             key: 'characters',
             value: JSON.stringify(result.data.results)
           });
-          console.log("Characters from API");
+          console.log("Characters loaded from API");
         }
       }
       );
     }
     checkStorage();
+    
   }, []);
 
+  const deleteCharacter = async(id: number) => {
+    await Storage.get({ key: 'characters' }).then(async(data) => {
+      if (data.value) {
+        const characters = JSON.parse(data.value);
+        const newCharacters = characters.filter((character: { id: number; }) => character.id !== id);
+        setCharacters(newCharacters);
+        Storage.set({
+          key: 'characters',
+          value: JSON.stringify(newCharacters)
+        });
+        Toast.show({
+          text: `${character.name} has been deleted`,
+          duration: 'long',
+        });
+        console.log(`Character "${character.name}" deleted`);
+        }
+      }
+    );
+  }
 
   const fillApi = async () => {
     const url = `https://rickandmortyapi.com/api/character/?page=${page}`;
@@ -65,8 +85,16 @@ const Home: React.FC = () => {
     setCharacters((characters) => [
       ...characters.concat(result.data.results),
     ]);
+    Storage.set({
+      key: 'characters',
+      value: JSON.stringify(characters)
+    });
     setPage(page + 1);
   };
+
+  const hola = () => {
+    console.log(hola);
+  }
 
   return (
     <IonPage ref={pageRef}>
@@ -99,7 +127,7 @@ const Home: React.FC = () => {
         ) : null}        
       </IonContent>
       {nextstate ? (
-        <Card character={character} setNextstate={setNextstate}/>
+        <Card character={character} setNextstate={setNextstate} deleteCharacter={deleteCharacter} />
         ) : null }
     </IonPage>
   );

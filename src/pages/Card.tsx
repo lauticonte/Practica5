@@ -13,7 +13,6 @@ import {
 } from "@ionic/react";
 import { Character } from "../models/character.model";
 import { trashBin} from "ionicons/icons";
-import { Toast } from "@capacitor/toast";
 
 const Card: React.FC<{
     character: Character;

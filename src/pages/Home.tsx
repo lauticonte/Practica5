@@ -40,6 +40,7 @@ const Home: React.FC = () => {
           setCharacters(characters);
           console.log("Characters loaded from LocalStorage");
         } else {
+          try {
           const url = 'https://rickandmortyapi.com/api/character';
           const result = await axios.get(url);
           setCharacters(result.data.results);
@@ -48,13 +49,19 @@ const Home: React.FC = () => {
             value: JSON.stringify(result.data.results)
           });
           console.log("Characters loaded from API");
-        }
+            } catch (error) {
+                Toast.show({
+                    text: "Error loading characters from API",
+                    duration: "short"
+              })
+            }
+          }
+        })
       }
-      );
-    }
     checkStorage();
-    
   }, []);
+    
+    
 
   const deleteCharacter = async(id: number) => {
     await Storage.get({ key: 'characters' }).then(async(data) => {

@@ -99,10 +99,6 @@ const Home: React.FC = () => {
     setPage(page + 1);
   };
 
-  const hola = () => {
-    console.log(hola);
-  }
-
   return (
     <IonPage ref={pageRef}>
       <IonHeader>

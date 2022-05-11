@@ -19,7 +19,7 @@ import CharacterContainer from '../components/CharacterContainer';
 import { addCircle } from 'ionicons/icons';
 import { Character } from '../models/character.model';
 import Card from './Card';
-// import { Storage } from "@capacitor/storage";
+import { Storage } from "@capacitor/storage";
 
 
 const Home: React.FC = () => {
@@ -32,14 +32,29 @@ const Home: React.FC = () => {
   const [plusicon, setPlusicon] = useState(true);
 
   useEffect(() => {
-    const getApi = async () => {
-      const url = `https://rickandmortyapi.com/api/character`;
-      const result = await axios.get(url);
-      setCharacters(result.data.results);      
-    };
-    getApi();
-    // saveCharacters(characters);
+    const checkStorage = async () => {
+      await Storage.get({ key: 'characters' }).then(async (data) => {
+        if (data.value) {
+          const characters = JSON.parse(data.value);
+          setCharacters(characters);
+          console.log("Characters from storage");
+
+        } else {
+          const url = 'https://rickandmortyapi.com/api/character';
+          const result = await axios.get(url);
+          setCharacters(result.data.results);
+          Storage.set({
+            key: 'characters',
+            value: JSON.stringify(result.data.results)
+          });
+          console.log("Characters from API");
+        }
+      }
+      );
+    }
+    checkStorage();
   }, []);
+
 
   const fillApi = async () => {
     const url = `https://rickandmortyapi.com/api/character/?page=${page}`;
@@ -51,17 +66,7 @@ const Home: React.FC = () => {
       ...characters.concat(result.data.results),
     ]);
     setPage(page + 1);
-    // saveCharacters(characters);
   };
-
-  // const saveCharacters = async (characters: Character[]) => {
-  //   const json = JSON.stringify(characters);
-  //   await Storage.set({
-  //     key: 'characters',
-  //     value: json,
-  //   });
-  // };
-
 
   return (
     <IonPage ref={pageRef}>

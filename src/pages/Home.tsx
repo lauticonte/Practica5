@@ -11,6 +11,9 @@ import {
   IonRow,
   IonCol,
   IonIcon,
+  useIonToast,
+  IonAlert,
+  useIonAlert,
 } from '@ionic/react';
 
 import './Home.css';
@@ -31,6 +34,7 @@ const Home: React.FC = () => {
   const [character, setCharacter] = useState<Character>({});
   const [page, setPage] = useState(2);
   const [plusicon, setPlusicon] = useState(true);
+  const [present, dismiss] = useIonAlert();
 
   useEffect(() => {
     const checkStorage = async () => {
@@ -107,7 +111,26 @@ const Home: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Characters</IonTitle>
-          <IonButton slot='end' size="small" onClick={getFromApi}>
+          <IonButton slot='end' size="small" onClick={() =>
+            present({
+              message: `Are you sure you want to restore characters?`,
+              buttons: [
+                {
+                  text: "Cancel",
+                  role: "cancel",
+                  handler: () => {
+                    dismiss();
+                  }
+                },
+                {
+                  text: "Restore",
+                  handler: () => {
+                    getFromApi();
+                  }
+                }
+              ]
+            })
+          }>
             <IonIcon icon={download} />
           </IonButton>
         </IonToolbar>

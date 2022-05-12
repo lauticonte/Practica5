@@ -16,7 +16,7 @@ import {
 import './Home.css';
 import axios from 'axios';
 import CharacterContainer from '../components/CharacterContainer';
-import { addCircle } from 'ionicons/icons';
+import { addCircle, download } from 'ionicons/icons';
 import { Character } from '../models/character.model';
 import Card from './Card';
 import { Storage } from "@capacitor/storage";
@@ -40,27 +40,30 @@ const Home: React.FC = () => {
           setCharacters(characters);
           console.log("Characters loaded from LocalStorage");
         } else {
-          try {
-          const url = 'https://rickandmortyapi.com/api/character';
-          const result = await axios.get(url);
-          setCharacters(result.data.results);
-          Storage.set({
-            key: 'characters',
-            value: JSON.stringify(result.data.results)
-          });
-          console.log("Characters loaded from API");
-            } catch (error) {
-                Toast.show({
-                    text: "Error loading characters from API",
-                    duration: "short"
-              })
-            }
+          getFromApi();
           }
         })
       }
     checkStorage();
   }, []);
     
+  const getFromApi = async () => {
+    try {
+      const url = 'https://rickandmortyapi.com/api/character';
+      const result = await axios.get(url);
+      setCharacters(result.data.results);
+      Storage.set({
+        key: 'characters',
+        value: JSON.stringify(result.data.results)
+      });
+      console.log("Characters loaded from API");
+        } catch (error) {
+            Toast.show({
+                text: "Error loading characters from API",
+                duration: "short"
+          })
+        }
+  }
     
 
   const deleteCharacter = async(id: number) => {
@@ -104,6 +107,9 @@ const Home: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle>Characters</IonTitle>
+          <IonButton slot='end' size="small" onClick={getFromApi}>
+            <IonIcon icon={download} />
+          </IonButton>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
